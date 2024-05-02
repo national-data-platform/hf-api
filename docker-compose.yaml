@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - ${PWD}/api/app:/usr/src/app
+    environment:
+      - APIDB_URL
+    ports:
+      - "8000:8000"
+    command: ["gunicorn","app.app:app","-k", "uvicorn.workers.UvicornWorker","--log-level=debug", "--bind", "0.0.0.0:8000","--timeout","720"]
+
+  postgres:
+    image: postgis/postgis
+    restart: always
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
