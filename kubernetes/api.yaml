@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hf-api
+  labels:
+    k8s-app: hf-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: hf-api
+  template:
+    metadata:
+      labels:
+        k8s-app: hf-api
+    spec:
+      containers:
+      - name: hf-api
+        image: iperezx/hg-api:latest
+        command: ["gunicorn"]
+        args: ["app.app:app","-k", "uvicorn.workers.UvicornWorker","--log-level=debug", "--bind", "0.0.0.0:8000","--timeout","720"]
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: hf-env
+        resources:
+          limits:
+            cpu: 3
+            memory: 8Gi
+          requests:
+            cpu: 3
+            memory: 8Gi
+        ports:
+        - name: hf-api
+          containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hf-api
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    k8s-app: hf-api
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: haproxy
+    ingress.kubernetes.io/timeout-server: "1200s"
+  name: hf-api-ingress
+spec:
+  rules:
+  - host: hf-api.nrp-nautilus.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hf-api
+            port:
+              number: 8000
+  tls:
+  - hosts:
+    - hf-api.nrp-nautilus.io

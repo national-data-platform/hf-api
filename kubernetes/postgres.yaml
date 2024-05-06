@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hf-postgres
+  labels:
+    k8s-app: hf-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: hf-postgres
+  template:
+    metadata:
+      labels:
+        k8s-app: hf-postgres
+    spec:
+      containers:
+      - name: hf-postgres
+        image: postgis/postgis
+        envFrom:
+        - secretRef:
+            name: hf-env
+        resources:
+          limits:
+            cpu: 2
+            memory: 8Gi
+          requests:
+            cpu: 2
+            memory: 8Gi
+        ports:
+        - name: hf-postgres
+          containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: hf-postgresvol
+      volumes:
+      - name: hf-postgresvol
+        persistentVolumeClaim:
+          claimName: hf-postgresvol
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hf-postgres
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    k8s-app: hf-postgres

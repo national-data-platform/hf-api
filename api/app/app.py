@@ -3,10 +3,6 @@ from app.db import create_db_and_tables, init_db, engine
 from app.models import ModelData
 from sqlmodel import Session, select
 
-
-#if these change, need to change the nginx files
-sensordata_kml_filename= 'sensordata.kml'
-
 app = FastAPI()
 
 @app.on_event("startup")
