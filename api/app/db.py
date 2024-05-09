@@ -4,6 +4,8 @@ import time
 from app.models import ModelData
 from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy_utils.functions import database_exists, create_database
+import sys
+import traceback
 
 APIDB_URL = os.environ.get("APIDB_URL")
 
@@ -51,3 +53,5 @@ def init_db():
             print(f'Uploading {len(model_data)} records', flush=True)
         except:
             print('Error with uploading huggingface model data', flush=True)
+            ex, val, tb = sys.exc_info()
+            traceback.print_exception(ex, val, tb)
