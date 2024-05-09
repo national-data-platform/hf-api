@@ -12,7 +12,7 @@ services:
       - APIDB_URL
     ports:
       - "8000:8000"
-    command: ["gunicorn","app.app:app","-k", "uvicorn.workers.UvicornWorker","--log-level=debug", "--bind", "0.0.0.0:8000","--timeout","720"]
+    command: ["gunicorn","app.app:app","-k", "uvicorn.workers.UvicornWorker","--log-level=debug", "--bind", "0.0.0.0:8000","--timeout","7200"]
 
   postgres:
     image: postgis/postgis

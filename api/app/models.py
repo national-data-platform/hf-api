@@ -5,8 +5,11 @@ from datetime import datetime
 class ModelData(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     modelId: str
+    author: str
     created_at: Optional[datetime]
     private: bool
     downloads: int
     library_name: Optional[str]
     tags: List[str]
+    text: str
+    content: str
