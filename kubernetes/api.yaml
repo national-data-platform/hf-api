@@ -14,9 +14,18 @@ spec:
       labels:
         k8s-app: hf-api
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                  - rci-tide-gpu-05.sdsu.edu
       containers:
       - name: hf-api
-        image: iperezx/hg-api:latest
+        image: iperezx/hg-api:0.2.0
         command: ["gunicorn"]
         args: ["app.app:app","-k", "uvicorn.workers.UvicornWorker","--log-level=debug", "--bind", "0.0.0.0:8000","--timeout","720"]
         imagePullPolicy: Always
